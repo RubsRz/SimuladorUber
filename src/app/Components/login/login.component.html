@@ -1,0 +1,45 @@
+<div class="container-page" id="Container">
+    
+    <div class="register-container" id="RegisterContainer" [className]="myClass ? 'activado' : 'desactivado'">
+        <h1 class="title">SIGN UP</h1>
+        <form action="">
+            <div class="input-line-container">
+                <span class="name-input">Username</span>
+                <input type="text" name="username" class="input-line" [(ngModel)]="userData.username">
+            </div>
+            <div class="input-line-container">
+                <span class="name-input">Email</span>
+                <input type="email" name="email" class="input-line" [(ngModel)]="userData.email">
+            </div>
+            <div class="input-line-container">
+                <span class="name-input">Password</span>
+                <input type="password" name="password" class="input-line" [(ngModel)]="userData.password">
+            </div>
+            <input type="button" value="SIGN UP" class="button-login" (click)="saveUser()">
+            <span id="Login" class="button-second" (click)="cambiarClase()">I ALREADY HAVE AN ACCOUNT</span>
+        </form>
+    </div>
+
+
+
+    <div class="login-container" id="LoginContainer" [className]="myClass ? 'desactivado' : 'activado'">
+        <h1 class="title">SIGN IN</h1>
+        <form action="">
+            <div class="input-line-container">
+                <span class="name-input">E-mail</span>
+                <input type="text" name="username" class="input-line" [(ngModel)]="email" />
+            </div>
+            <div class="input-line-container">
+                <span class="name-input">Password</span>
+                <input type="text" name="password" class="input-line" [(ngModel)]="password" />
+            </div>
+            <input type="button" (click)="iniciarSesion()" value="login" class="button-login" />
+            <div id="Register" class="button-second" (click)="cambiarClase()">SIGN UP</div>
+        </form>
+    </div>
+
+
+</div>
+
+
+

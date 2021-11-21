@@ -3,29 +3,37 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "node serve.js",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "heroku-postbuild": "ng build --prod"
   },
   "private": true,
   "dependencies": {
     "@angular/animations": "~12.2.0",
+    "@angular/cli": "^13.0.3",
     "@angular/common": "~12.2.0",
     "@angular/compiler": "~12.2.0",
+    "@angular/compiler-cli": "^12.2.13",
     "@angular/core": "~12.2.0",
     "@angular/forms": "~12.2.0",
     "@angular/platform-browser": "~12.2.0",
     "@angular/platform-browser-dynamic": "~12.2.0",
     "@angular/router": "~12.2.0",
+    "angularfire2": "^5.4.2",
+    "express": "^4.17.1",
+    "firebase": "^7.24.0",
+    "path": "^0.12.7",
     "rxjs": "~6.6.0",
     "tslib": "^2.3.0",
+    "typescript": "~4.3.5",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~12.2.1",
-    "@angular/cli": "~12.2.1",
-    "@angular/compiler-cli": "~12.2.0",
+    "@angular/cli": "^13.0.3",
+    "@angular/compiler-cli": "^12.2.13",
     "@types/jasmine": "~3.8.0",
     "@types/node": "^12.11.1",
     "jasmine-core": "~3.8.0",
@@ -35,5 +43,9 @@
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "~1.7.0",
     "typescript": "~4.3.5"
+  },
+  "engines": {
+    "node": "14.17.5",
+    "npm": "6.14.14"
   }
 }
