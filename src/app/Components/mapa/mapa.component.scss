@@ -1,5 +1,5 @@
 #map {
-    height: 80vh;
+    height: 85vh;
     width: 80vw;
     margin: 0px 0px 20px;
     background-color: white;
@@ -9,11 +9,28 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: 0px 0px 35px;
 }
 
 button{
     padding: 10px;
-    border: 3px solid rgb(37, 237, 255);
-    border-radius:25px;
-    width: 12%;
+    border: 3px solid rgb(250, 255, 184);
+    border-radius:12px;
+    width: 20%;
+    cursor: pointer;
+}
+
+button:hover{
+    background-color: rgb(167, 244, 251);
+}
+
+
+@media screen and (max-width: 1200px) {
+    button{
+        padding: 10px;
+        border: 3px solid rgb(147, 234, 250);
+        border-radius:25px;
+        width: 60%;
+        cursor: pointer;
+    }
 }
