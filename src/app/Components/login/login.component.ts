@@ -56,6 +56,7 @@ export class LoginComponent implements OnInit {
 
   signFace(){
     this.autenticador.auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
+    console.log('Sign in with Facebook')
   }
 
 
