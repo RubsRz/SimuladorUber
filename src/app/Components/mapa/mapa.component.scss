@@ -1,36 +1,44 @@
-#map {
-    height: 85vh;
-    width: 80vw;
-    margin: 0px 0px 20px;
-    background-color: white;
-}
-
-.myButton {
+#content{
     display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0px 0px 35px;
+    flex-direction: row;
+    justify-content: space-between;
+    // padding: 20px;
+    // height: 35.5em;
 }
 
-button{
-    padding: 10px;
-    border: 3px solid rgb(250, 255, 184);
-    border-radius:12px;
-    width: 20%;
-    cursor: pointer;
+#mapid{
+    margin:80px;
+    padding:26px;
+    height: 70vh; 
+    width: 55vw;
+    z-index: 0;
 }
 
-button:hover{
-    background-color: rgb(167, 244, 251);
+.datos{
+    margin:52px;
 }
 
+#botones{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
 
-@media screen and (max-width: 1200px) {
-    button{
-        padding: 10px;
-        border: 3px solid rgb(147, 234, 250);
-        border-radius:25px;
-        width: 60%;
-        cursor: pointer;
-    }
+.boton {
+    background-image: linear-gradient(to bottom, #7c32eb, #2980b9);
+    border-radius: 28px;
+    font-family: Arial;
+    color: #ffffff;
+    font-size: 20px;
+    padding: 10px 20px 10px 20px;
+    text-decoration: none;
+    border: 0px;
+    width: 100%;
+    margin: 5px 0px;
+}
+  
+.boton:hover {
+    background: #24d5f0;
+    background-image: linear-gradient(to bottom, #24d5f0, #1f08cc);
+    text-decoration: none;
 }

@@ -1,5 +1,30 @@
-<div id="map"></div>
+<div id="content">
+    
+    <div id="mapid"></div>
 
-<div class="myButton">
-    <button routerLink="/viajes"> MIS VIAJES </button>
+<div class="datos">
+
+    <div>
+        <h3>Punto de partida: </h3>
+        <p>{{startingPoint}}</p>
+    </div>
+    <div>
+        <h3>Punto de destino: </h3>
+        <p>{{arrivalPoint}}</p>
+    </div>
+
+    <div class="precio">
+        <p>{{cost | currency}}</p>
+    </div>
+        
+    <div id="botones">
+        <button class="boton" (click)="saveTravel()">Confirmar Viaje</button>
+        <button class="boton" routerLink="/viajes">Mis Viajes</button>
+        <button class="boton" (click)="logout()">Log out</button>
+    </div>
+
+</div>
+
+
+
 </div>

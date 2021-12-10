@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
+import { AngularFireAuth } from 'angularfire2/auth'
+import * as firebase from 'firebase/app'
 
 @Component({
   selector: 'app-login',
@@ -27,7 +29,7 @@ export class LoginComponent implements OnInit {
     password: string;
   }
 
-  constructor(public firebase: AngularFireDatabase, private router:Router) { 
+  constructor(public firebase: AngularFireDatabase, private router:Router, public autenticador: AngularFireAuth) { 
 
     this.userData = {
       $key: '',
@@ -50,6 +52,10 @@ export class LoginComponent implements OnInit {
       console.log('USERS', this.users)
     })
 
+  }
+
+  signFace(){
+    this.autenticador.auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
   }
 
 

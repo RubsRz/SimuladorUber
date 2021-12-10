@@ -10,6 +10,8 @@ import { FormsModule } from '@angular/forms';
 
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
+import { AngularFireAuthModule } from 'angularfire2/auth'
+
 import { environment } from '../environments/environment'
 
 @NgModule({
@@ -24,6 +26,7 @@ import { environment } from '../environments/environment'
     AppRoutingModule,
     FormsModule,
     AngularFireDatabaseModule,
+    AngularFireAuthModule,
     AngularFireModule.initializeApp(environment.firebase_config)
   ],
   providers: [],

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 
 declare const L: any;
 
@@ -9,122 +11,185 @@ declare const L: any;
 })
 export class MapaComponent implements OnInit {
 
-  title = 'locationApp';
+  title = 'LocationApp';
+  startingPoint: string;
+  arrivalPoint: string;
+  distance: number;
+  startingCoords: number[];
+  arrivalCoords: number[];
+  cost: number;
+  travelList: AngularFireList<any>;
+  userList: AngularFireList<any>;
+  $userId: string;
+  date: Date = new Date();
 
+  constructor(public firebase:AngularFireDatabase, private router:Router) {
+    // const userInfo = localStorage.getItem('loggedUser');
+    
+    this.startingPoint = 'Tú ubicación actual';
+    this.arrivalPoint = '';
+    this.distance = 0;
+    this.startingCoords = [];
+    this.arrivalCoords = [];
+    this.cost = 0;
+    this.travelList = this.firebase.list('travel');
+    this.userList = this.firebase.list('users');
+    this.$userId = '';
+  }
+  
+  // What to do when the app is charged 
   ngOnInit() {
-    if (!navigator.geolocation) {
-      console.log('location is not supported');
-    }
+    if(!navigator.geolocation) {
+      alert("Geolocation is not available");
+    } 
     navigator.geolocation.getCurrentPosition((position) => {
       const coords = position.coords;
       const latLong = [coords.latitude, coords.longitude];
-      console.log( 
-        `lat: ${position.coords.latitude}, lon: ${position.coords.longitude}`
-      );
-      let mymap = L.map('map').setView(latLong, 13);
+      const mymap = L.map('mapid').setView(latLong, 13);
+      this.startingCoords = latLong;
 
-      L.tileLayer(
-        'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic3VicmF0MDA3IiwiYSI6ImNrYjNyMjJxYjBibnIyem55d2NhcTdzM2IifQ.-NnMzrAAlykYciP4RP9zYQ',
-        {
-          attribution:
-            'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-          maxZoom: 18,
-          id: 'mapbox/streets-v11',
-          tileSize: 512,
-          zoomOffset: -1,
-          accessToken: 'pk.eyJ1IjoiYWxmcmVkby1jYXN0aWxsbyIsImEiOiJja3R6NTVuOXExazV4MnVxbTZlMTd0N2E3In0.Z-U3MFRclsA-vWYq_KY2_Q',
-        } 
-      ).addTo(mymap);
+      L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18,
+        id: 'mapbox/streets-v11',
+        tileSize: 512,
+        zoomOffset: -1,
+        accessToken: 'pk.eyJ1IjoidHJpczQ2MCIsImEiOiJja3U5NGh3ZjYwMHdvMnNwNGRkaW5mOWl6In0.QmylwVimyPHfEpm0TQob3A'
+      }).addTo(mymap);
 
-      var myIcon = L.icon({
-        iconUrl: '../assets/img/map-pin.png',
-        iconSize: [40, 45]
-    });
+      // Save the results of search/click a place
+      let results = L.layerGroup().addTo(mymap);
 
-      let marker = L.marker(latLong,{draggable:true,icon:myIcon}).addTo(mymap);
-      marker.on('dragend', (objeto:any)=>{
-        alert("El mapa se detuvo en " + objeto.target._latlng.lat +", "+ objeto.target._latlng.lng)
-      })
-
-
-      marker.bindPopup('<b>Hola Guapo</b>').openPopup();
+      // Add marker when the user clicks
+      mymap.on('click', (object: any) => {
+        results.clearLayers();
+        console.log(route);
+        results.addLayer(L.marker(object.latlng));
+        route.spliceWaypoints(1, 1, object.latlng);
+        setTimeout(() => {
+          const pathRoute = route._routes[0];
+          const pathSelectRoute = route._selectedRoute.coordinates;
+          const i = pathSelectRoute.length - 1;
+          this.distance = pathRoute.summary.totalDistance;
+          this.arrivalPoint = pathRoute.name;
+          const lat = pathSelectRoute[i].lat;
+          const lon = pathSelectRoute[i].lng;
+          this.arrivalCoords = [lat,lon];
+          this.cost = this.getCost();
+        }, 1000);
+      });
 
       let popup = L.popup()
-        .setLatLng(latLong)
-        .setContent('Aquí estás') 
+        .setLatLng([coords.latitude, coords.longitude])
+        .setContent('Tú Estás Aquí')
         .openOn(mymap);
 
-        // Añadiendo leaflet
+      // Add leaflet-routing-machine
+      const route = L.Routing.control({
+        waypoints: [
+          L.latLng(coords.latitude, coords.longitude)
+        ]
+      }).addTo(mymap);
 
-        let ruta = L.Routing.control({
-          waypoints: [
-            L.latLng(coords.latitude, coords.longitude),
-            L.latLng( 21.867542071296167, -102.3087799994685 )
-          ],
-            routeWhileDragging: true,
-            reverseWaypoints: true,
-            showAlternatives: true,
-            altLineOptions: {
-                styles: [
-                    {color: 'black', opacity: 0.15, weight: 9},
-                    {color: 'white', opacity: 0.8, weight: 6},
-                    {color: 'blue', opacity: 0.5, weight: 2}
-                ]
-            }
-            
-        }).addTo(mymap);
-        
+      // Add Esri leaflet
+      let arcgisOnlineProvider = L.esri.Geocoding.arcgisOnlineProvider({
+        apikey: 'AAPK2b894d73745048c8b59bbd997cfdace1-4SZpfhfwEIeF6QFmZG-1NKVqLEm_stfBKmRJVvSdmXoii7tC8-b3rzIb5HBxoqu' // replace with your api key - https://developers.arcgis.com
+      });
+      let searcher = L.esri.Geocoding.geosearch({
+        providers: [arcgisOnlineProvider]
+      }).addTo(mymap);
 
+      searcher.on('results', (data: any) => {
+        results.clearLayers();
+        for(let i = data.results.length - 1; i >= 0; i--) {
+          results.addLayer(L.marker(data.results[i].latlng));
+          route.spliceWaypoints(1, 1, data.results[i].latlng);
+        }
+        setTimeout(() => {
+          const pathRoute = route._routes[0];
+          const pathSelectRoute = route._selectedRoute.coordinates;
+          const i = pathSelectRoute.length - 1;
+          this.distance = pathRoute.summary.totalDistance;
+          this.arrivalPoint = pathRoute.name;
+          const lat = pathSelectRoute[i].lat;
+          const lon = pathSelectRoute[i].lng;
+          this.arrivalCoords = [lat,lon];
+          console.log(pathSelectRoute);
+          this.cost = this.getCost();
+        }, 1000);
+      });
+      });
+      this.watchPosition();
+      this.getUserID();
+    }
 
-        //Añadiendo Esri leaflet
-        var arcgisOnlineProvider = L.esri.Geocoding.arcgisOnlineProvider({
-          apikey: 'AAPKddfb706fb169401bade2b6c31b4e049a-C5zyF7oA9g6PF0O1lK09hxZi_Aukt2yz4rVvo6UAx8usjGggUTsRsE4LOSxHqGB' // replace with your api key - https://developers.arcgis.com
-        });
-
-        let buscador = L.esri.Geocoding.geosearch({
-          providers: [arcgisOnlineProvider]
-        }).addTo(mymap);
-    
-        
-
-        let results = L.layerGroup().addTo(mymap)
-        buscador.on('results',(data:any)=>{
-          results.clearLayers();
-          for (var i = data.results.length - 1; i >= 0; i--) {
-            results.addLayer(L.marker(data.results[i].latlng));
-
-            //AQUI VA EL CODIGO PARA ACTUALIZAR LA RUTA
-            ruta.spliceWaypoints(1,1, data.results[i].latlng);
-
-          }
-        });
-
-        
-
-    });
-    this.watchPosition();
-  }
-
-  watchPosition() {
-    let desLat = 0;
-    let desLon = 0;
-    let id = navigator.geolocation.watchPosition(
-      (position) => {
-        console.log(
-          `lat: ${position.coords.latitude}, lon: ${position.coords.longitude}`
-        );
+    watchPosition() {
+      let desLat = 0;
+      let desLon = 0;
+      let id = navigator.geolocation.watchPosition((position) => {
         if (position.coords.latitude === desLat) {
           navigator.geolocation.clearWatch(id);
         }
       },
-      (err) => {
-        console.log(err);
+      (err)=>{
+        console.log(`Error: ${err}`);
       },
       {
         enableHighAccuracy: true,
         timeout: 5000,
         maximumAge: 0,
+      });
+    }
+
+    logout() {
+      localStorage.removeItem('loggedUser');
+      this.router.navigateByUrl('/');
+    }
+
+    getCost(): number {
+      this.distance = this.distance / 1000;
+      if(this.distance < 10) {
+        this.cost = this.distance * 13.5;
+      } else if (this.distance < 30) {
+        this.cost = this.distance * 12.3;
+      } else {
+        this.cost = this.distance * 10.6;
       }
-    );
+      return this.cost;
+    }
+
+    saveTravel() {
+      this.travelList.push({
+        startCoords: this.startingCoords,
+        destinyCoords: this.arrivalCoords,
+        startingPoint: this.startingPoint,
+        arrivalPoint: this.arrivalPoint,
+        cost: this.cost,
+        date: this.date.toUTCString(),
+        user: this.$userId,
+      });
+      this.clearForm();
+    }
+
+    getUserID() {
+      this.userList.snapshotChanges().subscribe(item => {
+        item.forEach(user => {
+          const x: any = user.payload.toJSON();
+          let emailUser = localStorage.getItem('loggedUser');
+          const email = `{"user":${JSON.stringify(x)}}`;
+          if(email === emailUser) {
+            this.$userId = user.key ? user.key : '';
+          }
+        });
+      });
+    }
+
+    clearForm() {
+
+      this.startingCoords = [];
+      this.arrivalCoords = [];
+      this.cost = 0;
+      this.arrivalPoint = '';
+    }
   }
-}
+
