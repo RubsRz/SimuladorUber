@@ -10,7 +10,7 @@ import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 export class ViajesComponent implements OnInit {
 
   travelList: AngularFireList<any>;
-  travel: Array<any>;
+  travels: Array<any>;
   userList: AngularFireList<any>;
   user: Array<any>;
   $userId: string;
@@ -20,7 +20,7 @@ export class ViajesComponent implements OnInit {
     const userInfo = localStorage.getItem('loggedUser');
 
     this.travelList = this.firebase.list('travel');
-    this.travel = [];
+    this.travels = [];
     this.userList = this.firebase.list('users');
     this.user = [];
     this.$userId = '';
@@ -35,21 +35,21 @@ export class ViajesComponent implements OnInit {
     this.userList.snapshotChanges().subscribe(item => {
       item.forEach(user => {
         const x: any = user.payload.toJSON();
-        let emailUser = localStorage.getItem('loggedUser');
-        const email = `{"user":"${x.email}"}`;
-        if(email === emailUser) {
+        // let emailUser = localStorage.getItem('loggedUser');
+        // const email = `{"user":"${x.email}"}`;
+        // if(email === emailUser) {
           this.$userId = user.key ? user.key : '';
-        }
+        // }
       });
     });
     this.travelList.snapshotChanges().subscribe(item => {
-      this.travel = [];
+      this.travels = [];
       item.forEach(t => {
         let x = t.payload.toJSON();
-        this.travel.push(x);
+        this.travels.push(x);
       });
       this.travelForUser = [];
-      this.travel.forEach((item)=>{
+      this.travels.forEach((item)=>{
         if(item.user === this.$userId) {
           this.travelForUser.push(item);
         }

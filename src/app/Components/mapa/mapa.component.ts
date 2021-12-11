@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 
 declare const L: any;
+declare var paypal: any;
+
 
 @Component({
   selector: 'app-mapa',
@@ -10,6 +12,8 @@ declare const L: any;
   styleUrls: ['./mapa.component.scss']
 })
 export class MapaComponent implements OnInit {
+
+  @ViewChild('paypal', { static: true }) paypalDiv:ElementRef = {} as ElementRef;
 
   title = 'LocationApp';
   startingPoint: string;
@@ -121,6 +125,39 @@ export class MapaComponent implements OnInit {
       });
       this.watchPosition();
       this.getUserID();
+
+
+
+      //paypal
+      paypal.Buttons({
+        createOrder:(data:any, actions:any)=>{
+          return actions.order.create({
+            purchase_units:[
+              {
+                description: "viaje",
+                // date: this.date.toUTCString(),
+                amount: {
+                  value: this.cost,
+                  currency_code: 'MXN'
+                }
+              }
+            ]
+          })
+        },
+        onApprove: async(data:any, actions:any)=> {
+          const order = await actions.order.capture();
+          console.log("Si se pudo procesar la transaccion", order);
+          this.saveTravel();
+        },
+        onError:(err:any)=> {
+          console.log("No se pudo procesar la transaccion", err)
+        }
+      
+      }
+      ).render(this.paypalDiv.nativeElement)
+
+
+
     }
 
     watchPosition() {
@@ -155,7 +192,7 @@ export class MapaComponent implements OnInit {
       } else {
         this.cost = this.distance * 10.6;
       }
-      return this.cost;
+      return Math.round(this.cost);
     }
 
     saveTravel() {
@@ -191,5 +228,14 @@ export class MapaComponent implements OnInit {
       this.cost = 0;
       this.arrivalPoint = '';
     }
+
+
+
+
+
+
+//////
+
+
   }
 
