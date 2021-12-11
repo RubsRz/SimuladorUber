@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
+import { MapaComponent } from '../mapa/mapa.component';
 
 @Component({
   selector: 'app-viajes',
@@ -17,9 +18,8 @@ export class ViajesComponent implements OnInit {
   travelForUser: Array<any>;
 
   constructor(public firebase:AngularFireDatabase, private router: Router) {
-    const userInfo = localStorage.getItem('loggedUser');
 
-    this.travelList = this.firebase.list('travel');
+    this.travelList = this.firebase.list('viajes');
     this.travels = [];
     this.userList = this.firebase.list('users');
     this.user = [];
@@ -35,9 +35,6 @@ export class ViajesComponent implements OnInit {
     this.userList.snapshotChanges().subscribe(item => {
       item.forEach(user => {
         const x: any = user.payload.toJSON();
-        // let emailUser = localStorage.getItem('loggedUser');
-        // const email = `{"user":"${x.email}"}`;
-        // if(email === emailUser) {
           this.$userId = user.key ? user.key : '';
         // }
       });

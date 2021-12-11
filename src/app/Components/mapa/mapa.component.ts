@@ -28,7 +28,6 @@ export class MapaComponent implements OnInit {
   date: Date = new Date();
 
   constructor(public firebase:AngularFireDatabase, private router:Router) {
-    // const userInfo = localStorage.getItem('loggedUser');
     
     this.startingPoint = 'Tú ubicación actual';
     this.arrivalPoint = '';
@@ -36,7 +35,7 @@ export class MapaComponent implements OnInit {
     this.startingCoords = [];
     this.arrivalCoords = [];
     this.cost = 0;
-    this.travelList = this.firebase.list('travel');
+    this.travelList = this.firebase.list('viajes');
     this.userList = this.firebase.list('users');
     this.$userId = '';
   }
@@ -79,7 +78,7 @@ export class MapaComponent implements OnInit {
           const lat = pathSelectRoute[i].lat;
           const lon = pathSelectRoute[i].lng;
           this.arrivalCoords = [lat,lon];
-          this.cost = this.getCost();
+          this.cost = this.costos();
         }, 1000);
       });
 
@@ -119,7 +118,7 @@ export class MapaComponent implements OnInit {
           const lon = pathSelectRoute[i].lng;
           this.arrivalCoords = [lat,lon];
           console.log(pathSelectRoute);
-          this.cost = this.getCost();
+          this.cost = this.costos();
         }, 1000);
       });
       });
@@ -183,8 +182,8 @@ export class MapaComponent implements OnInit {
       this.router.navigateByUrl('/');
     }
 
-    getCost(): number {
-      this.distance = this.distance / 1000;
+    costos(): number {
+      this.distance /= 1000;
       if(this.distance < 10) {
         this.cost = this.distance * 13.5;
       } else if (this.distance < 30) {
