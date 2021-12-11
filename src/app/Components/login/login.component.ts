@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth'
 import * as firebase from 'firebase/app'
+import { AuthService } from '../../auth.service';
 
 @Component({
   selector: 'app-login',
@@ -29,7 +30,7 @@ export class LoginComponent implements OnInit {
     password: string;
   }
 
-  constructor(public firebase: AngularFireDatabase, private router:Router, public autenticador: AngularFireAuth) { 
+  constructor(public firebase: AngularFireDatabase, private router:Router, public autenticador: AngularFireAuth, public authService: AuthService) { 
 
     this.userData = {
       $key: '',
@@ -85,7 +86,7 @@ export class LoginComponent implements OnInit {
     let usuarioCorrecto = this.users.filter(user => user.email === this.email && user.password === this.password)
     
     if (usuarioCorrecto.length > 0){
-      alert('Credenciales correctas')
+      // alert('Credenciales correctas')
       this.irMapa()
       
     } else {
